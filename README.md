@@ -1,249 +1,309 @@
-# StudyHub V7 - Assistant d'étude intelligent
+# StudyHub V7 - Assistant d'Étude Intelligent
 
-Une application web moderne pour optimiser votre apprentissage avec des QCM, flashcards et résumés générés automatiquement à partir de vos documents PDF.
+Une application web moderne pour optimiser vos révisions avec l'intelligence artificielle.
 
-## 🎯 Fonctionnalités principales
+## 🚀 Nouvelles Fonctionnalités V7
 
-### 📚 Import et analyse de PDF
-- Import de documents PDF de cours
-- Extraction intelligente du contenu
-- Génération automatique de contenu d'étude
+### 🔐 Authentification Moderne
+- **Magic Links** : Connexion sans mot de passe via email
+- **OTP SMS** : Authentification par code SMS
+- **Authentification classique** : Fallback avec email/mot de passe
+- **Sessions sécurisées** : Gestion automatique des tokens et refresh
+- **Redirections intelligentes** : Retour à la page demandée après connexion
 
-### 🧠 Contenu généré automatiquement
-- **QCM** : 10 questions à choix multiples par document
-- **Flashcards** : Termes et définitions détectés automatiquement
-- **Résumés** : Points clés et structure du document
+### 🤖 Moteur d'IA Pédagogique
+- **Analyse intelligente** : Extraction automatique des concepts clés
+- **Génération de contenu** : Résumés, flashcards et QCM automatiques
+- **Support multi-formats** : PDF, TXT, DOC, DOCX
+- **Traitement par chunks** : Gestion des gros documents
+- **Modèles configurables** : GPT-4 Turbo ou GPT-3.5 Turbo
 
-### 📊 Gestion des matières
-- Organisation par matière avec codes couleur
-- Filtrage et recherche avancée
-- Statistiques de progression
+### 📚 Fonctionnalités Pédagogiques
+- **Résumés structurés** : Génération automatique de résumés par sections
+- **Flashcards intelligentes** : Questions/réponses basées sur le contenu
+- **QCM de qualité** : Questions avec distracteurs plausibles
+- **Interface moderne** : UX fluide et responsive
 
-### 🎮 Modes d'étude interactifs
-- **Mode QCM** : Quiz chronométrés avec suivi des erreurs
-- **Mode Flashcards** : Cartes mémoire avec animations 3D
-- **Rejouer erreurs** : Focus sur les questions ratées
+## 🛠️ Technologies
 
-### ☁️ Synchronisation cloud
-- Sauvegarde automatique sur Supabase
-- Fonctionnement hors ligne avec sync
-- Multi-comptes supportés
+- **Frontend** : React 18, Vite, Tailwind CSS
+- **Authentification** : Supabase Auth (passwordless)
+- **Base de données** : Supabase PostgreSQL
+- **IA** : OpenAI GPT-4/GPT-3.5
+- **État** : Zustand
+- **Animations** : Framer Motion
+- **Notifications** : React Hot Toast
 
-### 📱 Interface moderne
-- Design responsive et accessible
-- Mode sombre par défaut
-- Animations fluides avec Framer Motion
-
-## 🚀 Installation
+## 📦 Installation
 
 ### Prérequis
-- Node.js 18+ 
-- npm ou yarn
-- Compte Supabase (optionnel)
+- Node.js 18+
+- Compte Supabase
+- Clé API OpenAI (optionnel)
 
-### Installation locale
-
+### 1. Cloner le projet
 ```bash
-# Cloner le projet
 git clone <repository-url>
 cd studyhub-v7
-
-# Installer les dépendances
-npm install
-
-# Configuration Supabase (optionnel)
-cp .env.example .env.local
-# Remplir VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
-
-# Lancer en développement
-npm run dev
 ```
 
-L'application sera accessible sur `http://localhost:3000`
-
-### Build de production
-
+### 2. Installer les dépendances
 ```bash
-npm run build
-npm run preview
+npm install
 ```
 
-## 🛠️ Stack technique
-
-### Frontend
-- **React 18** - Interface utilisateur
-- **Vite** - Build tool et dev server
-- **Tailwind CSS** - Styling et design system
-- **Framer Motion** - Animations
-- **React Router** - Navigation
-- **Zustand** - Gestion d'état
-
-### Backend & Services
-- **Supabase** - Authentification et base de données
-- **PDF.js** - Parsing de documents PDF
-- **PDF-lib** - Manipulation de PDF
-- **jsPDF** - Export PDF
-
-### Outils de développement
-- **ESLint** - Linting
-- **Prettier** - Formatage
-- **TypeScript** - Typage statique
-
-## 📁 Structure du projet
-
-```
-studyhub-v7/
-├── src/
-│   ├── components/     # Composants réutilisables
-│   ├── pages/         # Pages de l'application
-│   ├── services/      # Services (Supabase, PDF)
-│   ├── stores/        # Stores Zustand
-│   ├── utils/         # Utilitaires
-│   ├── hooks/         # Hooks personnalisés
-│   └── assets/        # Ressources statiques
-├── public/            # Fichiers publics
-├── package.json       # Dépendances
-└── README.md         # Documentation
+### 3. Configuration des variables d'environnement
+```bash
+cp .env.example .env
 ```
 
-## 🔧 Configuration
-
-### Variables d'environnement
-
-Créez un fichier `.env.local` :
-
+Éditez le fichier `.env` :
 ```env
-VITE_SUPABASE_URL=your-supabase-url
-VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+# Configuration Supabase
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Configuration OpenAI (optionnel)
+VITE_OPENAI_API_KEY=your_openai_api_key
 ```
 
-### Configuration Supabase
+### 4. Configuration Supabase
 
-1. Créez un projet sur [Supabase](https://supabase.com)
-2. Configurez les tables suivantes :
+#### Créer un projet Supabase
+1. Allez sur [supabase.com](https://supabase.com)
+2. Créez un nouveau projet
+3. Récupérez l'URL et la clé anonyme
+
+#### Configurer l'authentification
+1. Dans votre projet Supabase, allez dans Authentication > Settings
+2. Activez "Enable email confirmations"
+3. Configurez les templates d'email pour les magic links
+4. (Optionnel) Configurez l'authentification SMS
+
+#### Créer les tables
+Exécutez le script SQL suivant dans l'éditeur SQL de Supabase :
 
 ```sql
 -- Table des matières
 CREATE TABLE subjects (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
   color TEXT DEFAULT '#3B82F6',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Table des QCM
-CREATE TABLE quizzes (
+-- Table des documents
+CREATE TABLE documents (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  subject_id UUID REFERENCES subjects(id),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
-  questions JSONB NOT NULL,
-  difficulty TEXT DEFAULT 'medium',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  original_filename TEXT,
+  file_size INTEGER,
+  file_type TEXT,
+  text_content TEXT,
+  ai_analysis JSONB,
+  ai_summary JSONB,
+  metadata JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Table des flashcards
 CREATE TABLE flashcards (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  subject_id UUID REFERENCES subjects(id),
-  term TEXT NOT NULL,
-  definition TEXT NOT NULL,
-  difficulty TEXT DEFAULT 'medium',
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  question TEXT NOT NULL,
+  answer TEXT NOT NULL,
+  category TEXT,
+  difficulty TEXT,
+  concept TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Table des questions QCM
+CREATE TABLE quiz_questions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
+  document_id UUID REFERENCES documents(id) ON DELETE CASCADE,
+  question TEXT NOT NULL,
+  options JSONB NOT NULL,
+  correct_answer TEXT NOT NULL,
+  explanation TEXT,
+  difficulty TEXT,
+  category TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Table des résultats de quiz
+CREATE TABLE quiz_results (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
+  score INTEGER NOT NULL,
+  total_questions INTEGER NOT NULL,
+  answers JSONB,
+  duration INTEGER,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Table des résumés
 CREATE TABLE summaries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  subject_id UUID REFERENCES subjects(id),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  subject_id UUID REFERENCES subjects(id) ON DELETE CASCADE,
   title TEXT NOT NULL,
-  key_points JSONB NOT NULL,
-  sections JSONB,
-  important_terms JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Table de l'historique des QCM
-CREATE TABLE quiz_history (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id),
-  quiz_id UUID REFERENCES quizzes(id),
-  score INTEGER NOT NULL,
-  total_questions INTEGER NOT NULL,
-  correct_answers INTEGER NOT NULL,
-  time_spent INTEGER,
-  date TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- Politiques RLS (Row Level Security)
+ALTER TABLE subjects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE flashcards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quiz_questions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE quiz_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE summaries ENABLE ROW LEVEL SECURITY;
+
+-- Politiques pour les matières
+CREATE POLICY "Users can view their own subjects" ON subjects
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own subjects" ON subjects
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own subjects" ON subjects
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own subjects" ON subjects
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Politiques pour les documents
+CREATE POLICY "Users can view their own documents" ON documents
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own documents" ON documents
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own documents" ON documents
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own documents" ON documents
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Politiques pour les flashcards
+CREATE POLICY "Users can view their own flashcards" ON flashcards
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own flashcards" ON flashcards
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own flashcards" ON flashcards
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own flashcards" ON flashcards
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Politiques pour les questions QCM
+CREATE POLICY "Users can view their own quiz questions" ON quiz_questions
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own quiz questions" ON quiz_questions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own quiz questions" ON quiz_questions
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own quiz questions" ON quiz_questions
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Politiques pour les résultats de quiz
+CREATE POLICY "Users can view their own quiz results" ON quiz_results
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own quiz results" ON quiz_results
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Politiques pour les résumés
+CREATE POLICY "Users can view their own summaries" ON summaries
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own summaries" ON summaries
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own summaries" ON summaries
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete their own summaries" ON summaries
+  FOR DELETE USING (auth.uid() = user_id);
 ```
 
-3. Activez Row Level Security (RLS) et configurez les politiques
+### 5. Lancer l'application
+```bash
+npm run dev
+```
 
-## 🎨 Personnalisation
+L'application sera disponible sur `http://localhost:5173`
 
-### Thèmes et couleurs
+## 🔧 Configuration OpenAI (Optionnel)
 
-Modifiez `tailwind.config.js` pour personnaliser :
-- Couleurs primaires et secondaires
-- Typographie
-- Animations personnalisées
+Pour utiliser l'analyse IA des documents :
 
-### Composants
-
-Tous les composants sont modulaires et réutilisables dans `src/components/`
+1. Créez un compte sur [OpenAI](https://openai.com)
+2. Générez une clé API
+3. Ajoutez la clé dans votre fichier `.env`
 
 ## 📱 Utilisation
 
-### Première utilisation
+### Authentification
+1. **Magic Link** : Entrez votre email et recevez un lien de connexion
+2. **OTP SMS** : Entrez votre numéro de téléphone et recevez un code
+3. **Classique** : Email et mot de passe
 
-1. Créez un compte ou connectez-vous
-2. Créez votre première matière
-3. Importez un PDF de cours
-4. L'application génère automatiquement le contenu d'étude
+### Upload de Documents
+1. Allez dans "Upload IA"
+2. Glissez-déposez ou sélectionnez un fichier (PDF, TXT, DOC, DOCX)
+3. Choisissez une matière
+4. Configurez les options avancées si nécessaire
+5. Cliquez sur "Traiter avec l'IA"
 
-### Workflow d'étude
-
-1. **Import** : Uploadez vos PDF de cours
-2. **Organisation** : Organisez par matière
-3. **Étude** : Utilisez les QCM et flashcards
-4. **Suivi** : Consultez vos statistiques
-5. **Révision** : Rejouez vos erreurs
-
-## 🔒 Sécurité
-
-- Authentification sécurisée via Supabase
-- Row Level Security (RLS) activé
-- Validation des données côté client et serveur
-- Pas de stockage de mots de passe en clair
+### Résultats
+- **Résumés** : Générés automatiquement par sections
+- **Flashcards** : Questions/réponses sur les concepts clés
+- **QCM** : Questions à choix multiples avec explications
 
 ## 🚀 Déploiement
 
-### Vercel (recommandé)
-
-```bash
-npm install -g vercel
-vercel
-```
-
 ### Netlify
+1. Connectez votre repository GitHub à Netlify
+2. Configurez les variables d'environnement dans Netlify
+3. Déployez automatiquement
 
-```bash
-npm run build
-# Uploadez le dossier dist/
-```
+### Vercel
+1. Connectez votre repository GitHub à Vercel
+2. Configurez les variables d'environnement
+3. Déployez automatiquement
 
-### Autres plateformes
+## 🔒 Sécurité
 
-L'application est compatible avec toutes les plateformes supportant les SPA React.
+- Authentification sécurisée avec Supabase
+- Row Level Security (RLS) activé
+- Tokens JWT sécurisés
+- Validation côté client et serveur
+- Protection CSRF
 
 ## 🤝 Contribution
 
 1. Fork le projet
 2. Créez une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
 4. Push vers la branche (`git push origin feature/AmazingFeature`)
 5. Ouvrez une Pull Request
 
@@ -253,19 +313,15 @@ Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
 
 ## 🆘 Support
 
-- **Documentation** : Ce README
-- **Issues** : GitHub Issues
-- **Email** : support@studyhub.com
+- Documentation : [Wiki du projet]
+- Issues : [GitHub Issues]
+- Email : support@studyhub.com
 
-## 🗺️ Roadmap
+## 🎯 Roadmap
 
-- [ ] Support des images dans les PDF
-- [ ] Mode collaboratif
-- [ ] API mobile
-- [ ] Intégration IA avancée
-- [ ] Support multi-langues
-- [ ] Mode hors ligne complet
-
----
-
-**StudyHub V7** - Transformez vos cours en expérience d'apprentissage interactive ! 🚀
+- [ ] Support OAuth (Google, GitHub)
+- [ ] Mode hors ligne
+- [ ] Export des données
+- [ ] Collaboration en temps réel
+- [ ] API publique
+- [ ] Applications mobiles

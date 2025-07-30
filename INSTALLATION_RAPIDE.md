@@ -1,110 +1,135 @@
 # 🚀 Installation Rapide - StudyHub V7
 
-## 📦 Décompression et installation
+Guide d'installation express pour StudyHub V7 avec authentification moderne et IA.
 
-### 1. Décompresser le ZIP
+## ⚡ Installation Express (5 minutes)
+
+### 1. Prérequis
+- Node.js 18+ installé
+- Compte Supabase (gratuit)
+- Clé OpenAI (optionnel)
+
+### 2. Cloner et installer
 ```bash
-unzip StudyHub_V7_Final.zip
+git clone <repository-url>
 cd studyhub-v7
-```
-
-### 2. Installation des dépendances
-```bash
 npm install
 ```
 
-### 3. Configuration Supabase (optionnel)
+### 3. Configuration Supabase (2 minutes)
+
+#### A. Créer un projet Supabase
+1. Allez sur [supabase.com](https://supabase.com)
+2. Cliquez "New Project"
+3. Choisissez votre organisation
+4. Nommez le projet "studyhub-v7"
+5. Créez un mot de passe pour la base de données
+6. Cliquez "Create new project"
+
+#### B. Récupérer les clés
+1. Dans votre projet, allez dans Settings > API
+2. Copiez :
+   - Project URL
+   - anon public key
+
+#### C. Configurer l'authentification
+1. Authentication > Settings
+2. Activez "Enable email confirmations"
+3. Dans "Site URL", mettez : `http://localhost:5173`
+4. Dans "Redirect URLs", ajoutez : `http://localhost:5173/auth/callback`
+
+#### D. Créer les tables
+1. SQL Editor > New query
+2. Copiez-collez le script SQL du README principal
+3. Exécutez le script
+
+### 4. Configuration locale
 ```bash
-cp .env.example .env.local
-# Éditer .env.local avec vos identifiants Supabase
+cp .env.example .env
 ```
 
-### 4. Démarrage
+Éditez `.env` :
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_OPENAI_API_KEY=your-openai-key  # Optionnel
+```
+
+### 5. Lancer l'application
 ```bash
 npm run dev
 ```
 
-L'application sera accessible sur `http://localhost:3000`
+🎉 **C'est tout !** L'application est accessible sur `http://localhost:5173`
 
-## ⚡ Démarrage ultra-rapide
+## 🔐 Test de l'authentification
 
-Si vous avez Node.js 18+ installé, utilisez le script automatique :
+### Magic Link
+1. Cliquez sur "Magic Link"
+2. Entrez votre email
+3. Vérifiez votre boîte mail
+4. Cliquez sur le lien reçu
 
-```bash
-chmod +x start.sh
-./start.sh
+### OTP SMS (si configuré)
+1. Cliquez sur "SMS"
+2. Entrez votre numéro de téléphone
+3. Entrez le code reçu
+
+## 🤖 Test de l'IA (optionnel)
+
+### Configuration OpenAI
+1. Allez sur [platform.openai.com](https://platform.openai.com)
+2. Créez un compte ou connectez-vous
+3. API Keys > Create new secret key
+4. Copiez la clé dans votre `.env`
+
+### Test d'upload
+1. Créez une matière dans l'app
+2. Allez dans "Upload IA"
+3. Uploadez un PDF de cours
+4. L'IA génère automatiquement le contenu !
+
+## 🚀 Déploiement rapide
+
+### Netlify (recommandé)
+1. Push votre code sur GitHub
+2. Connectez-vous sur [netlify.com](https://netlify.com)
+3. "New site from Git"
+4. Sélectionnez votre repository
+5. Dans "Environment variables", ajoutez vos variables d'environnement
+6. Deploy !
+
+### Variables d'environnement Netlify
 ```
-
-## 📋 Contenu du ZIP
-
-### 🎯 Fichiers principaux
-- `package.json` - Configuration et dépendances
-- `vite.config.js` - Configuration Vite
-- `tailwind.config.js` - Configuration Tailwind CSS
-- `index.html` - Point d'entrée HTML
-
-### 📁 Structure des dossiers
-```
-src/
-├── components/     # Composants réutilisables
-├── pages/         # Pages de l'application
-├── services/      # Services (Supabase, PDF)
-├── stores/        # Stores Zustand
-├── utils/         # Utilitaires
-└── assets/        # Ressources
-
-public/            # Fichiers publics
-```
-
-### 📄 Documentation
-- `README.md` - Documentation complète
-- `API.md` - Documentation de l'API
-- `.env.example` - Exemple de configuration
-
-### ⚙️ Configuration
-- `.eslintrc.cjs` - Configuration ESLint
-- `.prettierrc` - Configuration Prettier
-- `vercel.json` - Configuration Vercel
-- `netlify.toml` - Configuration Netlify
-
-## 🔧 Configuration Supabase
-
-1. Créez un projet sur [Supabase](https://supabase.com)
-2. Copiez l'URL et la clé anonyme
-3. Créez le fichier `.env.local` :
-
-```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_OPENAI_API_KEY=your-openai-key
 ```
 
-## 🎮 Utilisation
+## 🔧 Dépannage rapide
 
-1. **Créer un compte** ou se connecter
-2. **Créer une matière** (ex: Mathématiques)
-3. **Importer un PDF** de cours
-4. **Étudier** avec les QCM et flashcards générés automatiquement
+### Erreur "Supabase non configuré"
+- Vérifiez vos variables d'environnement
+- Redémarrez le serveur de développement
 
-## 🚀 Déploiement
+### Erreur "Service IA non configuré"
+- Ajoutez votre clé OpenAI dans `.env`
+- Ou utilisez l'app sans IA (fonctionne aussi !)
 
-### Vercel (recommandé)
-```bash
-npm install -g vercel
-vercel
-```
+### Erreur d'authentification
+- Vérifiez les URLs de redirection dans Supabase
+- Assurez-vous que l'email est confirmé
 
-### Netlify
-```bash
-npm run build
-# Uploadez le dossier dist/
-```
+### Erreur de base de données
+- Vérifiez que le script SQL a été exécuté
+- Vérifiez les politiques RLS
 
 ## 📞 Support
 
-- **Documentation** : `README.md`
-- **API** : `API.md`
+- **Documentation complète** : README.md
 - **Issues** : GitHub Issues
+- **Email** : support@studyhub.com
 
 ---
 
-**StudyHub V7** - Prêt à transformer vos cours en expérience d'apprentissage interactive ! 🎓✨
+**StudyHub V7** - Votre assistant d'étude intelligent ! 🧠✨

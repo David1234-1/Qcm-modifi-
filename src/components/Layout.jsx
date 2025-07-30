@@ -12,7 +12,8 @@ import {
   LogOut,
   Moon,
   Sun,
-  Settings
+  Settings,
+  Upload
 } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { useThemeStore } from '../stores/themeStore'
@@ -40,6 +41,7 @@ const Layout = () => {
   const navigation = [
     { name: 'Tableau de bord', href: '/dashboard', icon: Home },
     { name: 'Matières', href: '/subjects', icon: BookOpen },
+    { name: 'Upload IA', href: '/upload', icon: Upload },
     { name: 'Flashcards', href: '/flashcards', icon: Brain },
     { name: 'QCM', href: '/quiz', icon: FileText },
     { name: 'Résumés', href: '/summary', icon: FileText },
