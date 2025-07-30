@@ -1,7 +1,7 @@
 {
   "name": "studyhub-v7",
   "version": "7.0.0",
-  "description": "Application web éducative orientée productivité - Anki + QCM + résumés",
+  "description": "Application web éducative orientée productivité - Anki + QCM + résumés avec IA",
   "main": "index.html",
   "scripts": {
     "dev": "vite",
@@ -25,7 +25,8 @@
     "framer-motion": "^10.16.16",
     "react-hot-toast": "^2.4.1",
     "zustand": "^4.4.7",
-    "date-fns": "^2.30.0"
+    "date-fns": "^2.30.0",
+    "mammoth": "^1.6.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.45",
@@ -44,7 +45,10 @@
     "flashcards",
     "pdf-parser",
     "study-tools",
-    "supabase"
+    "supabase",
+    "ai",
+    "openai",
+    "passwordless-auth"
   ],
   "author": "StudyHub Team",
   "license": "MIT"

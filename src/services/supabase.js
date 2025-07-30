@@ -12,24 +12,66 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('2. Ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans vos variables d\'environnement')
 }
 
-// Création du client Supabase avec fallback
+// Création du client Supabase avec configuration avancée
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-key'
+  supabaseAnonKey || 'placeholder-key',
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce'
+    }
+  }
 )
 
-// Service d'authentification
+// Service d'authentification moderne
 export const authService = {
-  // Inscription
-  async signUp(email, password) {
-    const { data, error } = await supabase.auth.signUp({
+  // Envoi de magic link (authentification sans mot de passe)
+  async signInWithMagicLink(email, redirectTo = null) {
+    const { data, error } = await supabase.auth.signInWithOtp({
       email,
-      password,
+      options: {
+        emailRedirectTo: redirectTo || `${window.location.origin}/auth/callback`,
+        shouldCreateUser: true, // Créer automatiquement l'utilisateur s'il n'existe pas
+      }
     })
     return { data, error }
   },
 
-  // Connexion
+  // Envoi d'OTP par SMS (si configuré)
+  async signInWithOTP(phone, redirectTo = null) {
+    const { data, error } = await supabase.auth.signInWithOtp({
+      phone,
+      options: {
+        shouldCreateUser: true,
+      }
+    })
+    return { data, error }
+  },
+
+  // Vérification d'OTP
+  async verifyOTP(email, token) {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email'
+    })
+    return { data, error }
+  },
+
+  // Vérification d'OTP SMS
+  async verifySMSOTP(phone, token) {
+    const { data, error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: 'sms'
+    })
+    return { data, error }
+  },
+
+  // Connexion classique (fallback)
   async signIn(email, password) {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -38,7 +80,19 @@ export const authService = {
     return { data, error }
   },
 
-  // Déconnexion
+  // Inscription classique (fallback)
+  async signUp(email, password) {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      }
+    })
+    return { data, error }
+  },
+
+  // Déconnexion sécurisée
   async signOut() {
     const { error } = await supabase.auth.signOut()
     return { error }
@@ -64,6 +118,41 @@ export const authService = {
   async updateProfile(updates) {
     const { data, error } = await supabase.auth.updateUser(updates)
     return { data, error }
+  },
+
+  // Récupération de la session actuelle
+  async getSession() {
+    const { data: { session }, error } = await supabase.auth.getSession()
+    return { session, error }
+  },
+
+  // Récupération de l'utilisateur actuel
+  async getUser() {
+    const { data: { user }, error } = await supabase.auth.getUser()
+    return { user, error }
+  },
+
+  // Écoute des changements d'authentification
+  onAuthStateChange(callback) {
+    return supabase.auth.onAuthStateChange(callback)
+  },
+
+  // Gestion des erreurs d'authentification
+  getAuthError(error) {
+    const errorMessages = {
+      'Invalid login credentials': 'Email ou mot de passe incorrect',
+      'Email not confirmed': 'Veuillez confirmer votre email',
+      'Too many requests': 'Trop de tentatives. Veuillez réessayer plus tard',
+      'User not found': 'Aucun compte trouvé avec cet email',
+      'Invalid email': 'Format d\'email invalide',
+      'Password should be at least 6 characters': 'Le mot de passe doit contenir au moins 6 caractères',
+      'Unable to validate email address: invalid format': 'Format d\'email invalide',
+      'Signup is disabled': 'L\'inscription est temporairement désactivée',
+      'Email rate limit exceeded': 'Trop de demandes. Veuillez attendre avant de réessayer',
+      'Phone rate limit exceeded': 'Trop de demandes SMS. Veuillez attendre avant de réessayer'
+    }
+    
+    return errorMessages[error.message] || error.message || 'Une erreur est survenue'
   }
 }
 
@@ -278,6 +367,110 @@ export const dataService = {
     const { error } = await supabase.storage
       .from('studyhub-files')
       .remove([path])
+    
+    return { error }
+  },
+
+  // Documents
+  async getDocuments(userId, subjectId = null) {
+    let query = supabase
+      .from('documents')
+      .select('*')
+      .eq('user_id', userId)
+    
+    if (subjectId) {
+      query = query.eq('subject_id', subjectId)
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false })
+    return { data, error }
+  },
+
+  async getDocument(documentId) {
+    const { data, error } = await supabase
+      .from('documents')
+      .select('*')
+      .eq('id', documentId)
+      .single()
+    
+    return { data, error }
+  },
+
+  async createDocument(document) {
+    const { data, error } = await supabase
+      .from('documents')
+      .insert([document])
+      .select()
+    
+    return { data, error }
+  },
+
+  async updateDocument(id, updates) {
+    const { data, error } = await supabase
+      .from('documents')
+      .update(updates)
+      .eq('id', id)
+      .select()
+    
+    return { data, error }
+  },
+
+  async deleteDocument(id) {
+    const { error } = await supabase
+      .from('documents')
+      .delete()
+      .eq('id', id)
+    
+    return { error }
+  },
+
+  // Flashcards liées aux documents
+  async getDocumentFlashcards(documentId) {
+    const { data, error } = await supabase
+      .from('flashcards')
+      .select('*')
+      .eq('document_id', documentId)
+      .order('created_at', { ascending: false })
+    
+    return { data, error }
+  },
+
+  // Questions QCM liées aux documents
+  async getDocumentQuiz(documentId) {
+    const { data, error } = await supabase
+      .from('quiz_questions')
+      .select('*')
+      .eq('document_id', documentId)
+      .order('created_at', { ascending: false })
+    
+    return { data, error }
+  },
+
+  // Créer des questions QCM
+  async createQuizQuestions(questions) {
+    const { data, error } = await supabase
+      .from('quiz_questions')
+      .insert(questions)
+      .select()
+    
+    return { data, error }
+  },
+
+  async updateQuizQuestion(id, updates) {
+    const { data, error } = await supabase
+      .from('quiz_questions')
+      .update(updates)
+      .eq('id', id)
+      .select()
+    
+    return { data, error }
+  },
+
+  async deleteQuizQuestion(id) {
+    const { error } = await supabase
+      .from('quiz_questions')
+      .delete()
+      .eq('id', id)
     
     return { error }
   }

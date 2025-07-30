@@ -2,24 +2,34 @@ import React, { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
 import { useThemeStore } from './stores/themeStore'
-import { supabase } from './services/supabase'
+import { authService } from './services/supabase'
 
 // Pages
 import Login from './pages/Login'
 import Register from './pages/Register'
+import AuthCallback from './pages/AuthCallback'
 import Dashboard from './pages/Dashboard'
 import Subjects from './pages/Subjects'
 import Flashcards from './pages/Flashcards'
 import Quiz from './pages/Quiz'
 import Summary from './pages/Summary'
 import Profile from './pages/Profile'
+import DocumentUpload from './pages/DocumentUpload'
 
 // Components
 import Layout from './components/Layout'
 import LoadingSpinner from './components/LoadingSpinner'
 
 function App() {
-  const { user, setUser, loading, setLoading } = useAuthStore()
+  const { 
+    user, 
+    session,
+    setUser, 
+    setSession,
+    loading, 
+    setLoading,
+    isAuthenticated 
+  } = useAuthStore()
   const { isDark } = useThemeStore()
   const [error, setError] = useState(null)
   const [demoMode, setDemoMode] = useState(false)
@@ -58,17 +68,20 @@ function App() {
         
         if (!supabaseUrl || !supabaseKey) {
           console.warn('Mode démo : Supabase non configuré')
+          setDemoMode(true)
           setLoading(false)
           return
         }
 
-        const { data: { session }, error } = await supabase.auth.getSession()
+        // Récupérer la session actuelle
+        const { session, error } = await authService.getSession()
         
         if (error) {
           console.error('Erreur Supabase:', error)
           setError('Erreur de connexion à la base de données')
-        } else {
-          setUser(session?.user || null)
+        } else if (session) {
+          setUser(session.user)
+          setSession(session)
         }
       } catch (error) {
         console.error('Erreur lors de la vérification de la session:', error)
@@ -82,16 +95,36 @@ function App() {
 
     // Écouter les changements d'authentification (seulement si pas en mode démo)
     if (!demoMode) {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      const { data: { subscription } } = authService.onAuthStateChange(
         async (event, session) => {
-          setUser(session?.user || null)
-          setLoading(false)
+          console.log('Auth state change:', event, session?.user?.email)
+          
+          switch (event) {
+            case 'SIGNED_IN':
+              setUser(session?.user || null)
+              setSession(session)
+              setLoading(false)
+              break
+            case 'SIGNED_OUT':
+              setUser(null)
+              setSession(null)
+              setLoading(false)
+              break
+            case 'TOKEN_REFRESHED':
+              setSession(session)
+              break
+            case 'USER_UPDATED':
+              setUser(session?.user || null)
+              break
+            default:
+              break
+          }
         }
       )
 
       return () => subscription.unsubscribe()
     }
-  }, [setUser, setLoading, demoMode])
+  }, [setUser, setSession, setLoading, demoMode])
 
   // Afficher l'erreur si elle existe
   if (error) {
@@ -120,7 +153,7 @@ function App() {
   }
 
   // Vérifier si l'utilisateur est connecté ou en mode démo
-  const isAuthenticated = user || demoMode
+  const isUserAuthenticated = isAuthenticated() || demoMode
 
   return (
     <div className="min-h-screen bg-secondary-900">
@@ -128,17 +161,21 @@ function App() {
         {/* Routes publiques */}
         <Route 
           path="/login" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+          element={isUserAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
         />
         <Route 
           path="/register" 
-          element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
+          element={isUserAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
+        />
+        <Route 
+          path="/auth/callback" 
+          element={<AuthCallback />} 
         />
         
         {/* Routes protégées */}
         <Route 
           path="/" 
-          element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />} 
+          element={isUserAuthenticated ? <Layout /> : <Navigate to="/login" replace />} 
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
@@ -147,6 +184,7 @@ function App() {
           <Route path="quiz" element={<Quiz />} />
           <Route path="summary" element={<Summary />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="upload" element={<DocumentUpload />} />
         </Route>
         
         {/* Route par défaut */}
