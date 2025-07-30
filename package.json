@@ -6,9 +6,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:prod": "vite build --mode production",
     "preview": "vite preview",
     "lint": "eslint . --ext js,jsx,ts,tsx",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",
@@ -38,6 +41,10 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.1.1",
     "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "keywords": [
     "education",

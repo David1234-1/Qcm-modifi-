@@ -1,24 +1,34 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
 import { useThemeStore } from './stores/themeStore'
 import { authService } from './services/supabase'
 
-// Pages
-import Login from './pages/Login'
-import Register from './pages/Register'
-import AuthCallback from './pages/AuthCallback'
-import Dashboard from './pages/Dashboard'
-import Subjects from './pages/Subjects'
-import Flashcards from './pages/Flashcards'
-import Quiz from './pages/Quiz'
-import Summary from './pages/Summary'
-import Profile from './pages/Profile'
-import DocumentUpload from './pages/DocumentUpload'
+// Pages avec lazy loading pour améliorer les performances
+const Login = React.lazy(() => import('./pages/Login'))
+const Register = React.lazy(() => import('./pages/Register'))
+const AuthCallback = React.lazy(() => import('./pages/AuthCallback'))
+const Dashboard = React.lazy(() => import('./pages/Dashboard'))
+const Subjects = React.lazy(() => import('./pages/Subjects'))
+const Flashcards = React.lazy(() => import('./pages/Flashcards'))
+const Quiz = React.lazy(() => import('./pages/Quiz'))
+const Summary = React.lazy(() => import('./pages/Summary'))
+const Profile = React.lazy(() => import('./pages/Profile'))
+const DocumentUpload = React.lazy(() => import('./pages/DocumentUpload'))
 
 // Components
-import Layout from './components/Layout'
-import LoadingSpinner from './components/LoadingSpinner'
+const Layout = React.lazy(() => import('./components/Layout'))
+const LoadingSpinner = React.lazy(() => import('./components/LoadingSpinner'))
+
+// Composant de fallback pour le lazy loading
+const PageFallback = () => (
+  <div className="min-h-screen bg-secondary-900 flex items-center justify-center">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+      <p className="text-secondary-400">Chargement...</p>
+    </div>
+  </div>
+)
 
 function App() {
   const { 
@@ -33,6 +43,7 @@ function App() {
   const { isDark } = useThemeStore()
   const [error, setError] = useState(null)
   const [demoMode, setDemoMode] = useState(false)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
     // Vérifier le mode démo
@@ -59,6 +70,7 @@ function App() {
         // Si en mode démo, ne pas vérifier Supabase
         if (demoMode) {
           setLoading(false)
+          setIsInitialized(true)
           return
         }
 
@@ -70,6 +82,7 @@ function App() {
           console.warn('Mode démo : Supabase non configuré')
           setDemoMode(true)
           setLoading(false)
+          setIsInitialized(true)
           return
         }
 
@@ -88,6 +101,7 @@ function App() {
         setError('Erreur de connexion')
       } finally {
         setLoading(false)
+        setIsInitialized(true)
       }
     }
 
@@ -133,21 +147,35 @@ function App() {
         <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-6 max-w-md text-center">
           <h2 className="text-xl font-semibold text-red-400 mb-2">Erreur de connexion</h2>
           <p className="text-gray-300 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-          >
-            Recharger la page
-          </button>
+          <div className="space-y-2">
+            <button 
+              onClick={() => window.location.reload()} 
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg mr-2"
+            >
+              Recharger la page
+            </button>
+            <button 
+              onClick={() => {
+                localStorage.setItem('demoMode', 'true')
+                window.location.reload()
+              }} 
+              className="bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-2 rounded-lg"
+            >
+              Mode démo
+            </button>
+          </div>
         </div>
       </div>
     )
   }
 
-  if (loading) {
+  if (loading || !isInitialized) {
     return (
       <div className="min-h-screen bg-secondary-900 flex items-center justify-center">
-        <LoadingSpinner size="lg" />
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
+          <p className="text-secondary-400">Chargement de l'application...</p>
+        </div>
       </div>
     )
   }
@@ -157,39 +185,41 @@ function App() {
 
   return (
     <div className="min-h-screen bg-secondary-900">
-      <Routes>
-        {/* Routes publiques */}
-        <Route 
-          path="/login" 
-          element={isUserAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
-        />
-        <Route 
-          path="/register" 
-          element={isUserAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
-        />
-        <Route 
-          path="/auth/callback" 
-          element={<AuthCallback />} 
-        />
-        
-        {/* Routes protégées */}
-        <Route 
-          path="/" 
-          element={isUserAuthenticated ? <Layout /> : <Navigate to="/login" replace />} 
-        >
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="subjects" element={<Subjects />} />
-          <Route path="flashcards" element={<Flashcards />} />
-          <Route path="quiz" element={<Quiz />} />
-          <Route path="summary" element={<Summary />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="upload" element={<DocumentUpload />} />
-        </Route>
-        
-        {/* Route par défaut */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          {/* Routes publiques */}
+          <Route 
+            path="/login" 
+            element={isUserAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} 
+          />
+          <Route 
+            path="/register" 
+            element={isUserAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} 
+          />
+          <Route 
+            path="/auth/callback" 
+            element={<AuthCallback />} 
+          />
+          
+          {/* Routes protégées */}
+          <Route 
+            path="/" 
+            element={isUserAuthenticated ? <Layout /> : <Navigate to="/login" replace />} 
+          >
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="subjects" element={<Subjects />} />
+            <Route path="flashcards" element={<Flashcards />} />
+            <Route path="quiz" element={<Quiz />} />
+            <Route path="summary" element={<Summary />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="upload" element={<DocumentUpload />} />
+          </Route>
+          
+          {/* Route par défaut */}
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
     </div>
   )
 }

@@ -1,0 +1,14 @@
+# Redirections pour SPA React Router
+/auth/callback    /index.html   200
+/login            /index.html   200
+/register         /index.html   200
+/dashboard        /index.html   200
+/subjects         /index.html   200
+/flashcards       /index.html   200
+/quiz             /index.html   200
+/summary          /index.html   200
+/profile          /index.html   200
+/upload           /index.html   200
+
+# Redirection par défaut pour toutes les autres routes
+/*               /index.html   200

@@ -5,18 +5,74 @@
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="StudyHub V7 - Application web éducative orientée productivité avec QCM, flashcards et résumés automatiques" />
-    <meta name="keywords" content="éducation, quiz, flashcards, PDF, étude, productivité" />
+    <meta name="keywords" content="éducation, quiz, flashcards, PDF, étude, productivité, IA, OpenAI" />
     <meta name="author" content="StudyHub Team" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://studyhub-v7.netlify.app/" />
+    <meta property="og:title" content="StudyHub V7 - Votre assistant d'étude intelligent" />
+    <meta property="og:description" content="Application web éducative avec IA pour optimiser vos révisions" />
+    <meta property="og:image" content="/logo.svg" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://studyhub-v7.netlify.app/" />
+    <meta property="twitter:title" content="StudyHub V7 - Votre assistant d'étude intelligent" />
+    <meta property="twitter:description" content="Application web éducative avec IA pour optimiser vos révisions" />
+    <meta property="twitter:image" content="/logo.svg" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/src/main.jsx" as="script">
+    
     <title>StudyHub V7 - Votre assistant d'étude intelligent</title>
+    
+    <!-- Fallback styles for loading -->
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #0f172a;
+        color: #f8fafc;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .loading {
+        text-align: center;
+      }
+      .spinner {
+        border: 2px solid #3b82f6;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body class="bg-secondary-900 text-white antialiased">
-    <div id="root"></div>
+    <div id="root">
+      <!-- Fallback loading screen -->
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Chargement de StudyHub...</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
